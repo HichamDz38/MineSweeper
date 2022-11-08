@@ -1,4 +1,5 @@
 import tkinter as tk
+import tkinter.font as font
 import random
 
 
@@ -15,6 +16,9 @@ class Square(tk.Button):
         self.width = width
         self.height = height
         self.master = master
+        myFont = font.Font(size=20)
+        self["font"] = myFont
+
 
     def open_square(self, deep=True):
         "to check if the square is clean or hold a Mine"
@@ -23,7 +27,8 @@ class Square(tk.Button):
         self.status = 1
         if self.type == "Clean":
             value = self.get_neitherboard(deep=deep)
-            self.master.check_game()
+            if deep:
+                self.master.check_game()
             if value:
                 self.value = value
                 self['text'] = str(value)
@@ -114,6 +119,7 @@ class App(tk.Frame):
                 mine["background"] = "red"
             else:
                 mine["background"] = "blue"
+        
         for row in self.squares:
             for square in row:
                 # square['state'] = 'disabled'
