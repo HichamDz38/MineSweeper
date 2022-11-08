@@ -8,6 +8,7 @@ class Square(tk.Button):
                  x=None, y=None):
         super().__init__(master.master, bg="black", fg="black",
                          background="white", command=self.open_square)
+        self.bind('<Button-3>',self.flip_status)
         self.value = value
         self.type = type
         self.status = 0
@@ -60,6 +61,16 @@ class Square(tk.Button):
                     neitherboard.open_square()
         else:
             return value
+    
+    def flip_status(self, *args):
+        if self.status == 1:
+            return
+        if self.status & 2:
+            self.status = 0
+            self["background"] = "white"
+        elif not self.status:
+            self.status = 2
+            self["background"] = "blue"
 
 
 class App(tk.Frame):
