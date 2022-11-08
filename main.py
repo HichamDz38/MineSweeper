@@ -3,10 +3,10 @@ import random
 
 
 class Square(tk.Button):
-    def __init__(self, master, width, height, type=None, value=0, 
+    def __init__(self, master, width, height, type=None, value=0,
                  x=None, y=None):
-        super().__init__(master.master, bg="black",fg="black", background="white",
-                         command=self.open_square)
+        super().__init__(master.master, bg="black", fg="black",
+                         background="white", command=self.open_square)
         self.value = value
         self.type = type
         self.status = 0
@@ -15,7 +15,7 @@ class Square(tk.Button):
         self.width = width
         self.height = height
         self.master = master
-    
+
     def open_square(self, deep=True):
         "to check if the square is clean or hold a Mine"
         if self.status:
@@ -31,27 +31,27 @@ class Square(tk.Button):
         elif deep:
             self.master.game_over()
 
-    def get_neitherboard(self,deep=True):
+    def get_neitherboard(self, deep=True):
         "return tupe of neitherboard value"
         value = 0
         neitherboards = []
-        for i in range(-1,2):
-            for j in range(-1,2):
+        for i in range(-1, 2):
+            for j in range(-1, 2):
                 if i == 0 and j == 0:
                     continue
-                elif i + self.x < 0 or j + self.y<0:
+                elif i + self.x < 0 or j + self.y < 0:
                     continue
-                elif i+self.x >= len(self.master.squares) or \
-                j+self.y >= len(self.master.squares):
+                elif (i+self.x >= len(self.master.squares) or
+                      j+self.y >= len(self.master.squares)):
                     continue
                 if self.master.squares[self.x+i][self.y+j].type == "Bomb":
                     value += 1
                 else:
                     neitherboards += [self.master.squares[self.x+i][self.y+j]]
-        self["background"]="green"
-        if not(value) and deep:
+        self["background"] = "green"
+        if not value and deep:
             for neitherboard in neitherboards:
-                if not(neitherboard.status):
+                if not neitherboard.status:
                     neitherboard.open_square()
         else:
             return value
@@ -72,20 +72,23 @@ class App(tk.Frame):
         self.mine = []
         self.clean_squares = 0
         self.pack()
-    
+
     def new_game(self):
         squares_per_line = int(self.square_numbers**0.5)
         square_with = int(self.width/squares_per_line)
         for i in range(squares_per_line):
             squares = []
             for j in range(squares_per_line):
-                square = Square(self, square_with, square_with, "Clean", 0, i, j)
-                square.place(x=square_with*i, y=square_with*j, width = square_with, height = square_with)
+                square = Square(self, square_with, square_with,
+                                "Clean", 0, i, j)
+                square.place(x=square_with*i, y=square_with*j,
+                             width=square_with, height=square_with)
                 squares += [square]
             self.squares += [squares]
-        self.mines = [random.choice(random.choice(self.squares)) for i in range(self.mine_numbers)]
+        self.mines = [random.choice(random.choice(self.squares))
+                      for i in range(self.mine_numbers)]
         for mine in self.mines:
-            mine.type = "Bomb"      
+            mine.type = "Bomb"
 
     def check_game(self):
         self.clean_squares += 1
@@ -94,11 +97,12 @@ class App(tk.Frame):
             self.clear_game(False)
             return True
         return False
- 
+
     def game_over(self):
         self.clear_game()
-        #result = tk.Label(self,"game_over")
-        #result.place(x=0, y=self.height//2, width = self.width, height = self.height)
+        # result = tk.Label(self,"game_over")
+        # result.place(x=0, y=self.height//2, width=self.width,
+        # height = self.height)
 
     def clear_game(self, over=True):
         if over:
@@ -112,7 +116,7 @@ class App(tk.Frame):
                 mine["background"] = "blue"
         for row in self.squares:
             for square in row:
-                #square['state'] = 'disabled'
+                # square['state'] = 'disabled'
                 square.open_square(False)
 
 
