@@ -9,6 +9,7 @@ class Square(tk.Button):
                          command=self.open_square)
         self.value = value
         self.type = type
+        self.status = 0
         self.x = x
         self.y = y
         self.width = width
@@ -17,12 +18,14 @@ class Square(tk.Button):
     
     def open_square(self):
         "to check if the square is clean or hold a Mine"
+        self.status = 1
         if self.type == "Clean":
             value = self.get_neitherboard()
             if value:
                 self.value = value
                 self['text'] = str(value)
                 self["background"]="green"
+                self.master.check_game()
             return True
         else:
             print("game over")
@@ -48,7 +51,8 @@ class Square(tk.Button):
         if not(value):
             self["background"]="green"
             for neitherboard in neitherboards:
-                neitherboard.open_square()
+                if not(neitherboard.status):
+                    neitherboard.open_square()
         else:
             return value
 
@@ -57,6 +61,7 @@ class App(tk.Frame):
     def __init__(self, master, width, height, title,
                  mine_numbers, square_numbers):
         super().__init__(master)
+        self.status = True
         self.width = width
         self.height = height
         self.master.geometry("{}x{}".format(width, height))
@@ -65,6 +70,7 @@ class App(tk.Frame):
         self.mine_numbers = mine_numbers
         self.squares = []
         self.mine = []
+        self.clean_squares = 0
         self.pack()
     
     def new_game(self):
@@ -81,11 +87,27 @@ class App(tk.Frame):
         for mine in self.mines:
             mine.type = "Bomb"      
 
+    def check_game(self):
+        self.clean_squares += 1
+        print(self.clean_squares, self.square_numbers - self.mine_numbers)
+        if self.clean_squares == self.square_numbers - self.mine_numbers:
+            self.status = False
+            self.clear_game()
+            return True
+        return False
+ 
     def game_over(self):
+        self.clear_game(True)
+
+    def clear_game(self, over=False):
+        for mine in self.mines:
+            if over:
+                mine["background"] = "red"
+            else:
+                mine["background"] = "brown"
         for row in self.squares:
             for square in row:
-                square.destroy()
-
+                square['state'] = 'disabled'
 
 width = 400
 height = 400
