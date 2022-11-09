@@ -8,7 +8,7 @@ class Square(tk.Button):
                  x=None, y=None):
         super().__init__(master.master, bg="black", fg="black",
                          background="white", command=self.open_square)
-        self.bind('<Button-3>',self.flip_status)
+        self.bind('<Button-3>', self.flip_status)
         self.value = value
         self.type = type
         self.status = 0
@@ -19,7 +19,6 @@ class Square(tk.Button):
         self.master = master
         myFont = font.Font(size=20)
         self["font"] = myFont
-
 
     def open_square(self, deep=True):
         "to check if the square is clean or hold a Mine"
@@ -61,7 +60,7 @@ class Square(tk.Button):
                     neitherboard.open_square()
         else:
             return value
-    
+
     def flip_status(self, *args):
         if self.status == 1:
             return
@@ -126,11 +125,12 @@ class App(tk.Frame):
         else:
             print("great job")
         for mine in self.mines:
+            mine.status = 1
             if over:
                 mine["background"] = "red"
             else:
                 mine["background"] = "blue"
-        
+
         for row in self.squares:
             for square in row:
                 # square['state'] = 'disabled'
