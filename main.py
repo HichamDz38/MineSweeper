@@ -1,5 +1,6 @@
 import tkinter as tk
 import tkinter.font as font
+import tkinter.messagebox
 import random
 
 
@@ -17,8 +18,7 @@ class Square(tk.Button):
         self.width = width
         self.height = height
         self.master = master
-        myFont = font.Font(size=20)
-        self["font"] = myFont
+        self["font"] = master.myFont
 
     def open_square(self, deep=True):
         "to check if the square is clean or hold a Mine"
@@ -34,25 +34,25 @@ class Square(tk.Button):
                 self['text'] = str(value)
             return True
         elif deep:
-            self.master.game_over()
+            self.master.clear_game()
 
     def get_neitherboard(self, deep=True):
         "return tupe of neitherboard value"
         value = 0
         neitherboards = []
-        for i in range(-1, 2):
-            for j in range(-1, 2):
-                if i == 0 and j == 0:
+        for y in range(-1, 2):
+            for x in range(-1, 2):
+                if x == 0 and y == 0:
                     continue
-                elif i + self.x < 0 or j + self.y < 0:
+                elif x + self.x < 0 or y + self.y < 0:
                     continue
-                elif (i+self.x >= len(self.master.squares) or
-                      j+self.y >= len(self.master.squares)):
+                elif (x+self.x >= self.master.width or
+                      y+self.y >= self.master.height):
                     continue
-                if self.master.squares[self.x+i][self.y+j].type == "Bomb":
+                if self.master.squares[self.y+y][self.x+x].type == "Bomb":
                     value += 1
                 else:
-                    neitherboards += [self.master.squares[self.x+i][self.y+j]]
+                    neitherboards += [self.master.squares[self.y+y][self.x+x]]
         self["background"] = "green"
         if not value and deep:
             for neitherboard in neitherboards:
@@ -74,30 +74,34 @@ class Square(tk.Button):
 
 class App(tk.Frame):
     def __init__(self, master, width, height, title,
-                 mine_numbers, square_numbers):
+                 mine_numbers, square_with):
         super().__init__(master)
         self.status = True
         self.width = width
         self.height = height
-        self.master.geometry("{}x{}".format(width, height))
+        self.master.geometry("{}x{}".format(width*square_with,
+                                            height*square_with))
         self.master.title(title)
-        self.square_numbers = square_numbers
+        self.square_with = square_with
         self.mine_numbers = mine_numbers
-        self.squares = []
-        self.mine = []
-        self.clean_squares = 0
+        self.square_numbers = width*height
+        self.myFont = font.Font(size=int(.8*square_with))
         self.pack()
 
     def new_game(self):
-        squares_per_line = int(self.square_numbers**0.5)
-        square_with = int(self.width/squares_per_line)
-        for i in range(squares_per_line):
+        """start a new game and choice a rancom x places for the mines"""
+        self.squares = []
+        self.mine = []
+        self.clean_squares = 0
+        for y in range(self.height):
             squares = []
-            for j in range(squares_per_line):
-                square = Square(self, square_with, square_with,
-                                "Clean", 0, i, j)
-                square.place(x=square_with*i, y=square_with*j,
-                             width=square_with, height=square_with)
+            for x in range(self.width):
+                square = Square(self, self.square_with, self.square_with,
+                                "Clean", 0, x, y)
+                square.place(x=self.square_with*x, y=self.square_with*y,
+                             width=self.square_with,
+                             height=self.square_with)
+                #square['text'] = "{}-{}".format(y, x)
                 squares += [square]
             self.squares += [squares]
         self.mines = [random.choice(random.choice(self.squares))
@@ -106,6 +110,7 @@ class App(tk.Frame):
             mine.type = "Bomb"
 
     def check_game(self):
+        """check the game status if the player win/lose/game still open"""
         self.clean_squares += 1
         if self.clean_squares == self.square_numbers - self.mine_numbers:
             self.status = False
@@ -113,17 +118,9 @@ class App(tk.Frame):
             return True
         return False
 
-    def game_over(self):
-        self.clear_game()
-        # result = tk.Label(self,"game_over")
-        # result.place(x=0, y=self.height//2, width=self.width,
-        # height = self.height)
-
     def clear_game(self, over=True):
-        if over:
-            print("game over")
-        else:
-            print("great job")
+        """show the content of all boxes,
+           and ask the player for one more game"""
         for mine in self.mines:
             mine.status = 1
             if over:
@@ -133,16 +130,25 @@ class App(tk.Frame):
 
         for row in self.squares:
             for square in row:
-                # square['state'] = 'disabled'
                 square.open_square(False)
 
+        if over:
+            res = tkinter.messagebox.askokcancel(title="Game Over!",
+                                                 message="Try again?")
+            if res:
+                self.new_game()
+        else:
+            res = tkinter.messagebox.askokcancel(title="Nice Job!",
+                                                 message="Play again?")
+            if res:
+                self.new_game()
 
-width = 400
-height = 400
-mine_numbers = 10
-squares_numbers = 100
+width = 20
+height = 10
+mine_numbers = 30
+square_with = 30
 title = "Minesweeper"
 root = tk.Tk()
-myapp = App(root, width, height, title, mine_numbers, squares_numbers)
+myapp = App(root, width, height, title, mine_numbers, square_with)
 myapp.new_game()
 myapp.mainloop()
