@@ -101,7 +101,7 @@ class App(tk.Frame):
                 square.place(x=self.square_with*x, y=self.square_with*y,
                              width=self.square_with,
                              height=self.square_with)
-                #square['text'] = "{}-{}".format(y, x)
+                # square['text'] = "{}-{}".format(y, x)
                 squares += [square]
             self.squares += [squares]
         self.mines = [random.choice(random.choice(self.squares))
@@ -142,6 +142,7 @@ class App(tk.Frame):
                                                  message="Play again?")
             if res:
                 self.new_game()
+
 
 width = 20
 height = 10
